@@ -1,0 +1,55 @@
+name: Fedora Course CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-smoke-test:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+
+    steps:
+      - name: Install tools
+        run: dnf install -y git gcc make python3
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build C chapters
+        run: |
+          set -eux
+          make -C 01-os-introduction clean all
+          make -C 02-process-context-I clean all
+          make -C 03-process-context-II clean all
+          make -C 04-concurrency-I clean all
+          make -C 05-concurrency-II clean all
+          make -C 06-synchronization-I clean all
+          make -C 07-synchronization-II clean all
+          make -C 08-synchronization-III clean all
+
+      - name: Python syntax check
+        run: python3 -m py_compile 09-scheduling/scheduler_sim.py
+
+      - name: Synchronization smoke tests
+        run: |
+          set -eux
+          ./07-synchronization-II/bin/producer-consumer
+          ./07-synchronization-II/bin/readers-writers
+          ./07-synchronization-II/bin/dining-philosophers
+          ./08-synchronization-III/bin/monitor-queue
+          ./08-synchronization-III/bin/waitfor-cycle
+          ./08-synchronization-III/bin/livelock-demo
+
+      - name: Scheduling simulator smoke tests
+        run: |
+          set -eux
+          python3 09-scheduling/scheduler_sim.py --algo fcfs
+          python3 09-scheduling/scheduler_sim.py --algo sjf
+          python3 09-scheduling/scheduler_sim.py --algo srtf
+          python3 09-scheduling/scheduler_sim.py --algo priority
+          python3 09-scheduling/scheduler_sim.py --algo priority-preemptive
+          python3 09-scheduling/scheduler_sim.py --algo rr --quantum 2
+          python3 09-scheduling/scheduler_sim.py --algo mlfq

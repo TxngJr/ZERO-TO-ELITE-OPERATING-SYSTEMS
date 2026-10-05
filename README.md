@@ -10,8 +10,6 @@
 Why → Concept → Mental Model → Linux → Code → Run → Observe → Debug → Explain
 ~~~
 
-เราไม่เรียน OS ด้วย definition อย่างเดียว แต่สังเกต kernel/process/thread behavior และเขียน C experiments จริง
-
 ## Core roadmap
 
 1. ✅ Course Overview & OS Introduction
@@ -20,9 +18,9 @@ Why → Concept → Mental Model → Linux → Code → Run → Observe → Debu
 4. ✅ Concurrency Part I
 5. ✅ Concurrency Part II
 6. ✅ Synchronization Part I
-7. ⏳ Synchronization Part II
-8. ⏳ Synchronization Part III
-9. ⏳ Scheduling
+7. ✅ Synchronization Part II
+8. ✅ Synchronization Part III
+9. ✅ Scheduling
 10. ⏳ Address Translation
 11. ⏳ Virtual Memory
 
@@ -41,81 +39,97 @@ Why → Concept → Mental Model → Linux → Code → Run → Observe → Debu
 - [Chapter 06 — Synchronization Part I](./06-synchronization-I/README.md)
 - [Batch 02 Review](./BATCH-02-REVIEW.md)
 
-## Setup
+## Batch 3
 
-เริ่มจาก:
+- [Chapter 07 — Synchronization Part II](./07-synchronization-II/README.md)
+- [Chapter 08 — Synchronization Part III](./08-synchronization-III/README.md)
+- [Chapter 09 — Scheduling](./09-scheduling/README.md)
+- [Scheduling Exercises](./09-scheduling/EXERCISES.md)
+- [Scheduling References](./09-scheduling/REFERENCES.md)
+- [Batch 03 Review](./BATCH-03-REVIEW.md)
+
+## Setup
 
 ~~~bash
 git clone https://github.com/TxngJr/ZERO-TO-ELITE-OPERATING-SYSTEMS.git
 cd ZERO-TO-ELITE-OPERATING-SYSTEMS
 ~~~
 
-อ่าน:
+อ่าน [SETUP-FEDORA.md](./SETUP-FEDORA.md)
 
-- [Fedora Setup](./SETUP-FEDORA.md)
-
-ติดตั้ง lab tools ตามไฟล์ setup แล้วเรียนตามลำดับ
-
-## Build
-
-แต่ละ chapter ที่มี C examples ใช้:
-
-~~~bash
-cd 04-concurrency-I
-make
-~~~
-
-หลัก compiler flags:
+## Current knowledge chain
 
 ~~~text
--Wall -Wextra -Wpedantic -std=c17
-~~~
-
-thread examples เพิ่ม:
-
-~~~text
--pthread
-~~~
-
-## Current mastery target
-
-หลัง Chapter 06 ต้องอธิบายเส้นทางนี้ได้:
-
-~~~text
-Program
+Hardware
   ↓
-Process
+Kernel / User Space
   ↓
-CPU Context / Context Switch
+System Calls
+  ↓
+Process / Context Switch
   ↓
 fork / exec / wait
   ↓
-Thread
+Threads / Concurrency
   ↓
-Concurrency / Interleaving
+Race Conditions
   ↓
-Race Condition
+Mutex / Semaphore / Atomics
   ↓
-Invariant / Critical Section
+Producer–Consumer / Readers–Writers / Dining Philosophers
   ↓
-Mutex / Semaphore / Atomic / CAS
+Deadlock / Starvation / Livelock
+  ↓
+CPU Scheduling
 ~~~
 
-และต้องเข้าใจความแตกต่างสำคัญ:
+## Current practical programs
+
+หลักสูตรตอนนี้มี labs สำหรับ:
+
+- syscall observation
+- process/procfs inspection
+- fork/exec/wait/zombie
+- POSIX threads
+- race conditions
+- release/acquire atomics
+- mutex/semaphore/CAS
+- producer–consumer
+- readers–writers
+- dining philosophers
+- monitor-like queue
+- wait-for cycle detection
+- bounded livelock
+- CPU scheduling simulation
+
+## Scheduling Simulator
+
+~~~bash
+python3 09-scheduling/scheduler_sim.py --algo fcfs
+python3 09-scheduling/scheduler_sim.py --algo srtf
+python3 09-scheduling/scheduler_sim.py --algo rr --quantum 2
+python3 09-scheduling/scheduler_sim.py --algo mlfq
+~~~
+
+รองรับ:
 
 ~~~text
-Concurrency ≠ Parallelism
-Race Condition ≠ Data Race
-Atomic variable ≠ Atomic transaction
-System Call ≠ Process Context Switch
-Semaphore ≠ Mutex
-volatile ≠ Thread Synchronization
+FCFS
+SJF
+SRTF
+Priority
+Preemptive Priority
+Round Robin
+MLFQ
 ~~~
 
 ## Next Batch
 
-Batch 3:
+Batch 4 จะปิด Core Curriculum:
 
-- Chapter 07 — Synchronization Part II: Producer–Consumer, Readers–Writers, Dining Philosophers
-- Chapter 08 — Synchronization Part III: Monitor, Condition Variable, Deadlock, Starvation, Livelock
-- Chapter 09 — Scheduling: FCFS, SJF/SRTF, Priority, RR, MLFQ and metrics
+- Chapter 10 — Address Translation
+- Chapter 11 — Virtual Memory
+- Final Integration
+- Final Review
+- Capstone
+- Full Course Coverage Audit
