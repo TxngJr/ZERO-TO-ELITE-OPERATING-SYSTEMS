@@ -34,6 +34,10 @@ echo "==> Chapter 05 visibility"
 out="$(run 05-concurrency-II/examples/Chapter05.csproj visibility)"
 assert_contains "$out" "payload=42"
 
+echo "==> Chapter 06 synchronization self-test"
+out="$(run 06-synchronization-I/examples/Chapter06.csproj self-test)"
+assert_contains "$out" "Chapter06 self-test PASS"
+
 echo "==> Chapter 06 CAS invariant"
 out="$(run 06-synchronization-I/examples/Chapter06.csproj cas)"
 assert_contains "$out" "final stock=0"
