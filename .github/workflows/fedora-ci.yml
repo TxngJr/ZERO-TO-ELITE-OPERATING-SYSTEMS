@@ -4,17 +4,25 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build-and-correctness-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     container:
       image: fedora:45
 
     steps:
       - name: Install Fedora dependencies
         run: |
-          dnf install -y             git             dotnet-sdk-10.0             procps-ng             psmisc             strace             coreutils
+          dnf install -y \
+            git \
+            dotnet-sdk-10.0 \
+            procps-ng \
+            psmisc \
+            strace \
+            coreutils
 
       - name: Checkout
         uses: actions/checkout@v4
