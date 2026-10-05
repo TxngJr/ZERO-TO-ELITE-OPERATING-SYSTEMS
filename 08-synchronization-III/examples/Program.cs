@@ -1,6 +1,6 @@
 class Program
 {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
         string mode = args.Length == 0 ? "monitor" : args[0];
 
@@ -8,13 +8,16 @@ class Program
         {
             case "graph":
                 WaitForGraph();
-                break;
+                return 0;
             case "livelock":
                 Livelock();
-                break;
+                return 0;
+            case "self-test":
+                SelfTest();
+                return 0;
             default:
                 MonitorQueue();
-                break;
+                return 0;
         }
     }
 
@@ -65,6 +68,39 @@ class Program
         producer.Start();
         producer.Join();
         consumer.Join();
+
+        if (queue.Count != 0)
+            throw new InvalidOperationException("Monitor queue invariant failed.");
+    }
+
+    static bool HasCycle(int[][] edges)
+    {
+        bool[] visited = new bool[edges.Length];
+        bool[] active = new bool[edges.Length];
+
+        bool Dfs(int node)
+        {
+            visited[node] = true;
+            active[node] = true;
+
+            foreach (int next in edges[node])
+            {
+                if (next < 0 || next >= edges.Length)
+                    throw new ArgumentOutOfRangeException(nameof(edges), "Invalid graph edge.");
+
+                if (!visited[next] && Dfs(next)) return true;
+                if (active[next]) return true;
+            }
+
+            active[node] = false;
+            return false;
+        }
+
+        for (int i = 0; i < edges.Length; i++)
+            if (!visited[i] && Dfs(i))
+                return true;
+
+        return false;
     }
 
     static void WaitForGraph()
@@ -77,68 +113,89 @@ class Program
             new[] { 2 }
         };
 
-        bool[] visited = new bool[edges.Length];
-        bool[] active = new bool[edges.Length];
-
-        bool Dfs(int node)
-        {
-            visited[node] = true;
-            active[node] = true;
-
-            foreach (int next in edges[node])
-            {
-                if (!visited[next] && Dfs(next)) return true;
-                if (active[next]) return true;
-            }
-
-            active[node] = false;
-            return false;
-        }
-
-        bool cycle = false;
-        for (int i = 0; i < edges.Length && !cycle; i++)
-            if (!visited[i]) cycle = Dfs(i);
-
-        Console.WriteLine($"cycle_detected={cycle}");
+        Console.WriteLine($"cycle_detected={HasCycle(edges)}");
     }
 
     static void Livelock()
     {
+        // Deterministic bounded livelock demonstration.
+        // Three barriers make the phases explicit:
+        // 1) both announce intent,
+        // 2) both snapshot the conflict before either backs off,
+        // 3) both finish backing off before the next round.
+        const int rounds = 6;
         int[] intent = new int[2];
-        Barrier barrier = new(2);
+        bool[] conflict = new bool[2];
 
+        using Barrier barrier = new(2);
         Thread[] workers = new Thread[2];
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < workers.Length; i++)
         {
             int id = i;
             int other = 1 - i;
 
             workers[i] = new Thread(() =>
             {
-                for (int round = 1; round <= 6; round++)
+                for (int round = 1; round <= rounds; round++)
                 {
                     Volatile.Write(ref intent[id], 1);
                     barrier.SignalAndWait();
 
-                    if (Volatile.Read(ref intent[other]) == 1)
+                    conflict[id] = Volatile.Read(ref intent[other]) == 1;
+                    barrier.SignalAndWait();
+
+                    if (conflict[id])
                     {
-                        Console.WriteLine($"worker-{id}: conflict round={round}, back off");
+                        Console.WriteLine($"worker-{id}: conflict round={round}, backing off");
                         Volatile.Write(ref intent[id], 0);
-                        barrier.SignalAndWait();
-                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"worker-{id}: useful progress");
                     }
 
-                    Console.WriteLine($"worker-{id}: progress");
-                    Volatile.Write(ref intent[id], 0);
-                    return;
+                    barrier.SignalAndWait();
                 }
 
-                Console.WriteLine($"worker-{id}: bounded retry ended");
+                Console.WriteLine($"worker-{id}: bounded livelock demo ended");
             });
+
             workers[i].Start();
         }
 
-        foreach (Thread worker in workers) worker.Join();
+        foreach (Thread worker in workers)
+        {
+            if (!worker.Join(TimeSpan.FromSeconds(5)))
+                throw new TimeoutException("Livelock demo did not terminate.");
+        }
+
+        if (intent.Any(v => v != 0))
+            throw new InvalidOperationException("Livelock demo left intent set.");
+    }
+
+    static void SelfTest()
+    {
+        int[][] cyclic =
+        {
+            new[] { 1 },
+            new[] { 2 },
+            new[] { 0 }
+        };
+
+        int[][] acyclic =
+        {
+            new[] { 1 },
+            new[] { 2 },
+            Array.Empty<int>()
+        };
+
+        if (!HasCycle(cyclic))
+            throw new Exception("Cycle detector missed a cycle.");
+
+        if (HasCycle(acyclic))
+            throw new Exception("Cycle detector reported a false cycle.");
+
+        Console.WriteLine("Chapter08 self-test PASS");
     }
 }

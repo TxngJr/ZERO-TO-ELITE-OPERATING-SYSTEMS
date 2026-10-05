@@ -1,44 +1,117 @@
-# Full Core Coverage Audit — C# Edition
+# Full Core Coverage Audit
 
-## Language Audit
+## Definition of 100% in This Repository
 
-| Requirement | Status |
-|---|---:|
-| Teaching language examples are C# | ✅ |
-| Thread exercises use C# | ✅ |
-| Synchronization uses C# primitives | ✅ |
-| Scheduling simulator is C# | ✅ |
-| Address translation simulator is C# | ✅ |
-| Page replacement simulator is C# | ✅ |
-| Labs compile/run with dotnet | ✅ |
-| Linux commands retained only for OS observation | ✅ |
+100% หมายถึง:
 
-## Core Scope
+~~~text
+ครบ Core Scope Chapters 01–11
++
+ตรงกับ supplied C# coursework
++
+known correctness bugs ที่ audit พบถูกแก้
++
+examples build
++
+critical demos terminate
++
+algorithm/invariant tests ผ่าน
+~~~
 
-01 OS Introduction ✅  
-02 Process I ✅  
-03 Process II ✅  
-04 Concurrency I ✅  
-05 Concurrency II ✅  
-06 Synchronization I ✅  
-07 Synchronization II ✅  
-08 Synchronization III ✅  
-09 Scheduling ✅  
-10 Address Translation ✅  
-11 Virtual Memory ✅
+ไม่ได้หมายความว่า field Operating Systems ทั้งหมดจบที่ 11 บท
 
-## Primary C# Mapping
+---
 
-- Thread / Start / Join / Sleep
-- lock / Monitor.Wait / Monitor.PulseAll
-- Volatile
-- Interlocked
-- SemaphoreSlim
-- ReaderWriterLockSlim
-- Barrier
-- Process / ProcessStartInfo
-- Marshal / IntPtr
-- MemoryMappedFile
-- P/Invoke where OS visibility requires native API
+## Source Alignment
 
-Core Scope 01–11 is taught as a C#/.NET course on Linux.
+Activity 02-1 ✅  
+Activity 02-2 ✅  
+Activity 03-1 ✅  
+Activity 03-2 ✅  
+Unsafe Buffer ✅  
+Thread-Safe Buffer ✅  
+Case Study 02 ✅
+
+ดู ASSIGNMENT-MAPPING.md
+
+---
+
+## Chapter Coverage
+
+01 OS / Kernel / Syscall / Runtime ✅  
+02 Process / PID / State / PCB / CPU State ✅  
+03 Context Switch / fork / exec / wait / zombie ✅  
+04 Thread / Concurrency / Race / Critical Section ✅  
+05 Shared State / RMW / Check-Then-Act / Memory Ordering ✅  
+06 Lock / Monitor distinction / Semaphore / Interlocked / CAS ✅  
+07 Producer–Consumer / Readers–Writers / Dining Philosophers ✅  
+08 Deadlock / Starvation / Livelock / Priority Inversion ✅  
+09 FCFS / SJF / SRTF / Priority / RR / MLFQ / Linux scheduler context ✅  
+10 VA / PA / MMU / Page Table / TLB / Multi-Level Paging ✅  
+11 Demand Paging / Page Fault / Replacement / mmap / COW / Protection ✅
+
+---
+
+## Correctness Fixes Included
+
+- livelock Barrier accidental-deadlock bug fixed ✅
+- MLFQ one-tick requeue bug fixed ✅
+- hidden 4-KiB host-page assumption fixed ✅
+- VM first-touch lab moved to mmap ✅
+- mprotect child protection lab restored ✅
+- background-thread demo fixed ✅
+- SemaphoreSlim Release protected by finally ✅
+- System.Threading.Lock vs Monitor semantics separated ✅
+- file-backed COW vs fork COW separated ✅
+- scheduling assumptions documented ✅
+- CI upgraded from smoke-only to invariant/golden tests ✅
+
+---
+
+## Verification
+
+~~~bash
+./build.sh
+./verify.sh
+~~~
+
+CI pins:
+
+~~~text
+Fedora 45
+.NET 10 SDK feature line
+~~~
+
+---
+
+## Remaining Topics Outside Core Scope
+
+- Signals deep dive
+- Pipes/FIFOs
+- IPC/shared memory APIs
+- sockets
+- VFS/filesystems
+- page cache deep dive
+- block I/O
+- device drivers
+- interrupts architecture deep dive
+- namespaces/cgroups
+- containers
+- NUMA
+- allocator internals
+- futex internals
+- RCU
+- lock-free reclamation
+- io_uring
+- real-time Linux
+- SELinux/capabilities
+- virtualization
+- kernel build/debug
+- writing a kernel/OS
+
+ดังนั้นคำที่ถูกต้องคือ:
+
+~~~text
+Core 01–11 + supplied coursework alignment = complete target
+Entire Operating Systems field = intentionally beyond this core
+~~~

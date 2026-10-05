@@ -1,74 +1,240 @@
-# Course Guide — C# Edition
+# Course Guide — Zero to Elite Operating Systems with C#
 
-## เป้าหมาย
+## Scope
 
-เรียน Operating Systems โดยใช้ C# เป็นภาษาปฏิบัติหลักบน Fedora
+หลักสูตรนี้ตั้งใจให้ครบตาม Core Scope 01–11:
 
-ผู้เรียนต้องเชื่อมได้ว่า:
+1. OS Introduction
+2. Process & Context Switch I
+3. Process & Context Switch II
+4. Concurrency I
+5. Concurrency II
+6. Synchronization I
+7. Synchronization II
+8. Synchronization III
+9. Scheduling
+10. Address Translation
+11. Virtual Memory
+
+คำว่า “ครบ” ใน repo นี้หมายถึงครบตาม core scope นี้และตรงกับไฟล์ C# ที่เรียนที่ผู้ใช้ส่งมา
+
+ไม่ได้หมายความว่า field Operating Systems ทั้งหมดมีเพียง 11 บท
+
+---
+
+# Source Alignment
+
+เริ่มจาก:
+
+- ASSIGNMENT-MAPPING.md
+- SOURCE-ALIGNED-EXERCISES.md
+- SOURCE-ALIGNED-ANSWERS.md
+
+ไฟล์เหล่านี้ map:
 
 ~~~text
-C# code
-→ .NET runtime
-→ Linux process/thread
-→ system call
-→ kernel
-→ CPU / memory
+Activity 02-1
+Activity 02-2
+Activity 03-1
+Activity 03-2
+Unsafe Buffer
+Thread-Safe Buffer
+Case Study 02
 ~~~
 
-## Teaching Pattern
+เข้ากับ chapters ที่เกี่ยวข้อง
+
+หลักสำคัญ:
+
+ถ้า source ที่เรียนไม่ได้บอกบางอย่าง เช่น implementation ภายใน external CalculatingFunctions คอร์สจะระบุว่าไม่ทราบจาก source แทนการเดา
+
+---
+
+# Teaching Model
+
+ทุกบทใช้:
 
 ~~~text
 Why
 → Concept
 → OS Mental Model
-→ C# Mental Model
-→ C# Code
-→ Run
-→ Observe Linux
-→ Debug
+→ C#/.NET Mapping
+→ Broken Example
+→ Correct Example
+→ Fedora Observation
 → Exercise
+→ Self-Test / Invariant
 → Explain-It-Back
 ~~~
 
-## C# Programming Standard
+---
 
-ใช้ Thread, lock, Monitor, Interlocked, Volatile, Mutex, SemaphoreSlim, ReaderWriterLockSlim, Process และ MemoryMappedFile
+# C# Rule
 
-P/Invoke ใช้เฉพาะเมื่อ .NET ไม่มี abstraction ที่ทำให้เห็น OS concept นั้นตรงพอ
+source-code programming labs ใช้ C#
 
-## Important Rule
-
-อย่าเหมารวมว่า C# API = Linux syscall ชื่อเดียวกัน
+Linux commands ยังคงใช้สำหรับ OS observation
 
 ตัวอย่าง:
 
-~~~text
-Console.WriteLine ≠ write(2) ตรง ๆ หนึ่งครั้งเสมอ
-Process.Start ≠ fork() + execve() ที่เราควบคุมเองเสมอ
-Thread ≠ CPU core
+~~~bash
+ps
+strace
+pmap
+vmstat
+chrt
+taskset
 ~~~
 
-ให้ใช้ strace, ps, /proc และ Linux tools เพื่อพิสูจน์ runtime behavior
+P/Invoke ยังถือว่า source หลักเป็น C# และใช้เฉพาะจุดที่ต้องเห็น Linux primitive ตรงขึ้น เช่น:
 
-## Exercise Levels
+- gettid
+- write
+- mmap
+- munmap
+- mprotect
+- getrusage
 
-ทุกบทมี:
+---
 
-1. Recall
-2. Explain
-3. Trace
-4. C# Code Reading
-5. C# Debugging
-6. C# Implementation
-7. OS Observation
-8. Design
+# Critical C# Synchronization Rule
 
-## Midterm
+คอร์สแยก:
+
+~~~text
+System.Threading.Lock
+→ modern mutual exclusion
+
+object + lock + Monitor
+→ monitor condition synchronization
+~~~
+
+Activity 02 ใช้ System.Threading.Lock
+
+Activity 03 และ Thread-Safe Buffer ใช้ object + Monitor
+
+ห้ามสอนว่าเป็น implementation เดียวกันทุกประการ
+
+---
+
+# Study Loop
+
+ทุก lab:
+
+~~~text
+Predict
+→ Run
+→ Observe
+→ Compare
+→ Explain
+→ Modify
+→ Re-run
+~~~
+
+---
+
+# Mastery Gate
+
+ไม่ถือว่าผ่านบทเพราะ:
+
+- อ่านจบ
+- compile ผ่าน
+- copy code ได้
+
+ต้องทำได้:
+
+~~~text
+Explain
+Trace
+Predict
+Code
+Find Bug
+Fix Bug
+Observe Linux
+Calculate
+Design
+~~~
+
+---
+
+# Correctness
+
+อ่าน:
+
+- CORRECTNESS-GATES.md
+
+CI ต้องผ่าน:
+
+~~~text
+compile
++
+timeout/termination
++
+invariant assertions
++
+golden algorithm tests
+~~~
+
+ไม่ใช้เพียง exit code 0
+
+---
+
+# Midterm
 
 ประมาณ Chapters 01–05
 
-## Core Completion
+อ่าน:
 
-Chapters 01–11 เป็น Core Scope
+- MIDTERM-REVIEW-01-05.md
+- SOURCE-ALIGNED-EXERCISES.md Parts A–C
 
-หลังจากนั้นต่อ Advanced Track ได้ เช่น Signals, IPC, Filesystems, Containers, Kernel Modules และ OS Development
+---
+
+# Final
+
+อ่าน:
+
+- FINAL-INTEGRATION.md
+- FINAL-REVIEW.md
+- BATCH-04-REVIEW.md
+- capstone/README.md
+
+---
+
+# Build
+
+~~~bash
+./build.sh
+./verify.sh
+~~~
+
+ทั้งสองต้องผ่านก่อนถือว่า repository state พร้อมเรียน
+
+---
+
+# Beyond Core
+
+หัวข้อถัดไป:
+
+- Signals
+- Pipes
+- IPC
+- Shared Memory
+- Sockets
+- Filesystems / VFS
+- Page Cache
+- Block I/O
+- Device Drivers
+- Kernel Modules
+- Namespaces / cgroups
+- Containers
+- NUMA
+- Futex internals
+- RCU
+- Lock-Free programming
+- io_uring
+- Real-Time Linux
+- Security / SELinux / Capabilities
+- Virtualization
+- Kernel debugging
+- Small OS development

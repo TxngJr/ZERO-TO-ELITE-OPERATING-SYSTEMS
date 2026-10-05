@@ -1,28 +1,100 @@
-# Chapter 05 — Concurrency Part II with C#
+# Chapter 05 — Concurrency Part II
 
-## Goals
+## เป้าหมาย
 
-เข้าใจ shared mutable state, read-modify-write, check-then-act, Thread Safety, Reentrancy, visibility/order และ foreground/background threads
+หลังบทนี้ต้องเข้าใจ:
 
-## Check-Then-Act
+- Multithreading
+- Interleaving
+- Shared Resources
+- Read-Modify-Write
+- Check-Then-Act
+- Visibility
+- Ordering
+- Volatile
+- Interlocked
+- Thread Safety
+- Reentrancy
+- Foreground / Background Threads
+
+---
+
+## 1. Shared Mutable State
+
+ปัญหา concurrency ส่วนใหญ่เริ่มจาก:
 
 ~~~text
-check stock
-↓
-time passes / another thread runs
-↓
-act using old observation
+multiple execution flows
++
+same mutable state
++
+insufficient synchronization
 ~~~
 
-แม้ใช้ Interlocked ตอน decrement ก็ยังเกิด logical race ได้ถ้า check กับ act ไม่เป็น transaction เดียว
+ทางออกไม่ได้มีแค่ lock
 
-run:
+ยังมี:
 
-~~~bash
-dotnet run --project 05-concurrency-II/examples/Chapter05.csproj -- check-then-act
+- immutability
+- ownership
+- thread-local state
+- message passing
+- atomic operations
+
+---
+
+## 2. Read-Modify-Write
+
+ตัวอย่าง:
+
+~~~csharp
+counter++;
 ~~~
 
-## Volatile
+เป็น logical read-modify-write
+
+ถ้าต้องการ atomic increment ใช้:
+
+~~~csharp
+Interlocked.Increment(ref counter);
+~~~
+
+---
+
+## 3. Check-Then-Act
+
+ผิด:
+
+~~~text
+check stock > 0
+↓
+another thread changes stock
+↓
+act using stale observation
+~~~
+
+แม้ act ใช้ Interlocked แต่ถ้า check กับ act เป็นคนละ atomic event business invariant ยังพังได้
+
+---
+
+## 4. Atomicity vs Visibility vs Ordering
+
+ต้องแยก 3 เรื่อง:
+
+### Atomicity
+operation ไม่เห็น state กลางบางแบบ
+
+### Visibility
+write จาก thread หนึ่งถูก observe โดยอีก thread ตาม synchronization rules
+
+### Ordering
+compiler/JIT/CPU/runtime ต้องเคารพ ordering constraints ที่ synchronization primitive กำหนด
+
+ห้ามลดทุกอย่างเป็นคำว่า “race” อย่างเดียว
+
+---
+
+## 5. Volatile
 
 C# มี:
 
@@ -31,63 +103,132 @@ Volatile.Read(ref value);
 Volatile.Write(ref value, newValue);
 ~~~
 
-ใช้สำหรับ visibility/order pattern เฉพาะ ไม่ใช่ replacement ของ lock สำหรับ invariant หลายขั้น
+volatile access ใช้กับ visibility/order protocol บางรูปแบบ
 
-## Interlocked
+แต่ไม่ทำให้ compound operation กลายเป็น atomic
 
-Interlocked ให้ atomic read-modify-write เช่น:
+ผิด:
 
-~~~csharp
-Interlocked.Increment(ref counter);
-Interlocked.CompareExchange(ref value, newValue, expected);
+~~~text
+volatile int counter;
+counter++;
+→ atomic
 ~~~
 
-แต่ atomic primitive หนึ่งตัวไม่ทำให้ทั้ง business transaction atomic
+ไม่จริง
 
-## Thread Safety
+---
 
-code thread-safe เมื่อใช้งานพร้อมกันตาม contract แล้ว state ไม่เสีย
+## 6. Interlocked
 
-วิธีสร้าง thread safety:
+เหมาะกับ atomic state transition ขนาดเล็ก
 
-- lock
-- Monitor
-- Interlocked
-- immutable data
-- ownership
-- thread-local data
+เช่น:
 
-## Reentrancy
+- Increment
+- Decrement
+- Exchange
+- CompareExchange
 
-reentrant ไม่เท่ากับ thread-safe ทุกกรณี
+แต่ invariant หลาย fields อาจยังต้อง lock/protocol ที่ใหญ่กว่า
 
-ต้องดูว่า function ใช้ shared mutable state หรือ internal locks หรือไม่
+---
 
-## Background Thread
+## 7. Thread Safety
 
-C# มี:
+thread-safe หมายถึงใช้งาน concurrent ตาม contract แล้ว state/behavior ยังถูกต้อง
+
+ต้องระบุ contract ด้วย
+
+เช่น:
+
+~~~text
+method individually thread-safe
+does not automatically mean
+two-method transaction is atomic
+~~~
+
+---
+
+## 8. Reentrancy
+
+reentrant และ thread-safe ไม่ใช่คำเดียวกัน
+
+reentrancy สนใจ function ถูกเรียกซ้อน/interrupt-like reentry แล้ว state ปลอดภัยหรือไม่
+
+thread safety สนใจ concurrent calls ตาม contract
+
+---
+
+## 9. Background Threads
+
+C#:
 
 ~~~csharp
 thread.IsBackground = true;
 ~~~
 
-background thread ไม่เท่ากับ POSIX detached thread แบบ 1:1
+ถ้า process เหลือแต่ background threads runtime สามารถ terminate process ได้
 
-ถ้ามีแต่ background threads เหลือ process สามารถ terminate ได้
+เพื่อเห็นความต่าง lab ควรเปรียบเทียบ:
 
-## C# Exercises
+~~~text
+foreground no Join
+background no Join
+background with Join
+~~~
 
-1. สร้าง check-then-act inventory 1 ชิ้นกับ buyer 2 threads
-2. แก้ด้วย lock ให้ check+update อยู่ critical section เดียว
-3. เปรียบเทียบ Volatile.Read/Write กับ lock
-4. ใช้ ThreadLocal<int> เพื่อสร้าง per-thread state
-5. สร้าง background thread แล้วทดลอง Main จบโดยไม่ Join
-6. อธิบายเหตุผลที่ volatile ไม่แก้ compound invariant
+ไม่ควร demo background แล้ว Join ทันทีเพียงกรณีเดียว
 
-## Quiz
+---
 
-- Interlocked.Decrement atomic หรือไม่?
-- Atomic decrement ทำให้ check-then-act atomic ทั้งชุดหรือไม่?
-- Volatile = lock หรือไม่?
-- Background thread = process แยกหรือไม่?
-- Thread-safe = reentrant เสมอหรือไม่?
+## 10. Activity 03 State Predicate
+
+Activity 03 มี:
+
+~~~text
+hasValue
+exitflag
+~~~
+
+นี่คือตัวอย่าง state predicate
+
+ต่อไป Chapter 06–08 จะใช้:
+
+~~~text
+while predicate false
+→ Wait
+→ wake
+→ re-check
+~~~
+
+---
+
+## แบบฝึกหัด
+
+1. shared mutable state คืออะไร
+2. read-modify-write คืออะไร
+3. check-then-act bug
+4. atomicity vs visibility
+5. visibility vs ordering
+6. Volatile ใช้แทน lock ได้ทุกกรณีหรือไม่
+7. Interlocked.Increment แก้อะไร
+8. CAS คืออะไร
+9. business transaction หลายขั้นใช้ Interlocked ตัวเดียวพอไหม
+10. thread-safe vs reentrant
+11. foreground vs background
+12. สร้าง background no-Join experiment
+13. ใช้ ThreadLocal สร้าง per-thread state
+14. หา state predicates ใน Activity 03
+15. เตรียม pseudo-code สำหรับ Monitor.Wait
+
+---
+
+## Explain-It-Back
+
+~~~text
+shared state
+→ operation semantics
+→ atomicity / visibility / ordering
+→ choose synchronization strategy
+~~~

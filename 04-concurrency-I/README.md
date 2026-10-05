@@ -1,12 +1,41 @@
-# Chapter 04 — Concurrency Part I with C#
+# Chapter 04 — Concurrency Part I
 
-## Goals
+## เป้าหมาย
 
-เข้าใจ Thread, Concurrency, Parallelism, Interleaving, Race Condition, Critical Section และ Thread lifecycle
+หลังบทนี้ต้องเข้าใจ:
 
-## Thread in C#
+- Thread
+- Start / Join / Sleep
+- Concurrency vs Parallelism
+- Interleaving
+- Shared State
+- Race Condition
+- Critical Section
+- Activity 02 sequential vs threaded baseline
+- Case Study partition concept
 
-รูปแบบหลักตรงกับงานเรียน:
+---
+
+## 1. Thread
+
+Thread คือ execution flow ภายใน process
+
+threads ใน process เดียวกันมัก share:
+
+- heap
+- static fields
+- process address space
+- open resources
+
+แต่มี execution state ของตัวเอง:
+
+- stack
+- registers/context
+- scheduling state
+
+---
+
+## 2. Start / Join
 
 ~~~csharp
 Thread t = new Thread(Work);
@@ -14,62 +43,152 @@ t.Start();
 t.Join();
 ~~~
 
-Thread.Start ทำให้ thread พร้อม execute
+Start:
+ทำให้ thread เริ่ม execution lifecycle
 
-Thread.Join ทำให้ caller รอ thread จบ
+Join:
+caller รอ thread target จบ
 
-## Process vs Thread
+Join ไม่ได้ “รวมค่าผลลัพธ์” ให้เอง
 
-threads ใน process เดียวกัน share:
+---
 
-- process memory
-- static fields
-- heap objects
-- open resources หลายชนิด
+## 3. Thread.Sleep
 
-แต่แต่ละ thread มี:
+Sleep ทำให้ thread ไม่ runnable ชั่วคราวตาม requested interval
 
-- execution state
-- stack
-- scheduling state
+ไม่ใช่ synchronization primitive สำหรับ correctness
 
-## Concurrency vs Parallelism
+ผิด:
 
-Concurrency = หลาย execution flows มี progress ทับซ้อน/interleave
+~~~text
+Sleep 100 ms
+therefore another thread must have finished
+~~~
 
-Parallelism = execute พร้อมกันจริงบนหลาย logical CPUs
+ถูก:
 
-Thread ไม่เท่ากับ CPU core
+~~~text
+use Join / condition synchronization / other explicit protocol
+~~~
 
-## Race Condition in C#
+---
+
+## 4. Concurrency vs Parallelism
+
+Concurrency:
+
+หลาย execution flows มี progress overlap/interleave
+
+Parallelism:
+
+execute พร้อมกันจริงบนหลาย logical CPUs
+
+single-core ก็มี concurrency ได้ผ่าน time sharing
+
+---
+
+## 5. Interleaving
+
+สมมติ:
+
+~~~text
+A1 A2 A3
+B1 B2 B3
+~~~
+
+possible:
+
+~~~text
+A1 B1 A2 B2 B3 A3
+~~~
+
+program correctness ต้องไม่พึ่ง interleaving ที่ “เราหวังว่าจะเกิด”
+
+---
+
+## 6. Activity 02-1 — Sequential Baseline
+
+ไฟล์เรียนทำ plus() แล้ว minus() ต่อกัน
+
+ไม่มี concurrent access ต่อ sum
+
+จึงเป็น control baseline ที่ดีสำหรับเทียบกับ threaded version
+
+---
+
+## 7. Activity 02-2 — Threads + Lock
+
+ไฟล์ใช้:
+
+- Thread P
+- Thread M
+- Start
+- Join
+- Lock
+- Stopwatch
+
+สิ่งที่ต้องวิเคราะห์:
+
+- correctness
+- lock contention
+- lock acquisition count
+- scheduler overhead
+- JIT/benchmark noise
+
+การเพิ่ม threads ไม่รับประกันว่าเร็วขึ้น
+
+---
+
+## 8. Race Condition
+
+ถ้าสอง thread ทำ:
 
 ~~~csharp
 counter++;
 ~~~
 
-ไม่ได้ atomic เพียงเพราะเป็น C# statement หนึ่งบรรทัด
+logical decomposition:
 
-สอง threads สามารถเกิด lost update ได้
-
-run:
-
-~~~bash
-dotnet run --project 04-concurrency-I/examples/Chapter04.csproj -- race
+~~~text
+read
+compute
+write
 ~~~
 
-ต่างจาก C language data race ที่มี undefined-behavior concerns บางแบบ, C#/.NET มี memory model ของตนเอง แต่ unsynchronized shared-state code ก็ยัง incorrect และ visibility/order ต้องพิจารณา
+interleaving สามารถ lost update
 
-## Thread IDs
+---
 
-C# มี Managed Thread ID:
+## 9. Critical Section
 
-~~~csharp
-Environment.CurrentManagedThreadId
+critical section ไม่ใช่ “ทุก code ที่มี thread”
+
+มันคือ region ที่ต้องควบคุม concurrent access เพื่อรักษา invariant
+
+---
+
+## 10. Case Study — Partition + Local Reduction
+
+ไฟล์ Case Study แบ่งช่วงงานให้หลาย threads
+
+แต่ละ worker:
+
+~~~text
+compute localResult
+↓
+lock only once
+↓
+result += localResult
 ~~~
 
-Lab ยังเรียก Linux gettid ผ่าน P/Invoke เพื่อเปรียบเทียบกับ OS TID
+นี่ลด global contention เทียบกับ lock ทุก inner-loop update
 
-## Observe Linux Threads
+สิ่งที่ source ไม่บอก เช่น implementation Calculate1 ต้องไม่เดา
+
+---
+
+## 11. Linux Thread Observation
 
 ~~~bash
 dotnet run --project 04-concurrency-I/examples/Chapter04.csproj -- observe
@@ -82,20 +201,36 @@ ps -L -p PID -o pid,tid,psr,stat,comm
 ls /proc/PID/task
 ~~~
 
-## C# Exercises
+PSR บอก CPU ที่ tool รายงานสำหรับ task ณ observation ไม่ได้แปลว่า thread ถูก pin ถาวร
 
-1. สร้าง Thread 10 ตัวและ Join ทุกตัว
-2. ให้แต่ละ thread print ManagedThreadId
-3. สร้าง shared counter แบบไม่ lock และรัน 20 รอบ
-4. เพิ่ม Thread.Yield ใน loop แล้วเปรียบเทียบ
-5. อธิบายว่า output order ใด guaranteed / ไม่ guaranteed
-6. ใช้ Stopwatch เปรียบเทียบ sequential vs two threads
-7. อธิบายว่าทำไม more threads ไม่แปลว่า faster เสมอ
+---
 
-## Quiz
+## แบบฝึกหัด
 
-- Thread share heap หรือไม่?
-- Thread มี stack ของตัวเองหรือไม่?
-- counter++ atomic หรือไม่?
-- Concurrency ต้องมีหลาย cores หรือไม่?
-- Join มีไว้ทำอะไร?
+1. Process vs Thread
+2. Start ทำอะไร
+3. Join ทำอะไร
+4. Sleep ใช้แทน Join ได้หรือไม่
+5. Concurrency vs Parallelism
+6. single-core มี concurrency ได้ไหม
+7. counter++ ทำไม race ได้
+8. วาด lost-update interleaving
+9. ทำ sequential Activity 02 baseline
+10. ทำ threaded version
+11. รัน 20 รอบและเก็บเวลา
+12. อธิบายว่าทำไม timing แกว่ง
+13. สร้าง 10 threads แล้วดู Linux TIDs
+14. เปรียบเทียบ ManagedThreadId กับ TID
+15. ออกแบบ local reduction แบบ Case Study
+
+---
+
+## Explain-It-Back
+
+~~~text
+Thread creation
+→ scheduler interleaving
+→ shared state
+→ possible race
+→ identify critical section
+~~~

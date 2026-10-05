@@ -1,91 +1,143 @@
-# Study Order — C# Edition
+# Study Order
 
-## Phase 0
+## Phase 0 — Align with Class Material
 
 1. README.md
-2. COURSE-GUIDE.md
-3. SETUP-FEDORA.md
-4. CSHARP-OS-MAPPING.md
+2. ASSIGNMENT-MAPPING.md
+3. SOURCE-ALIGNED-EXERCISES.md
+4. COURSE-GUIDE.md
+5. SETUP-FEDORA.md
+6. CSHARP-OS-MAPPING.md
 
-## Phase 1 — OS and Process
+---
 
-- Chapter 01
-- Chapter 02
-- Chapter 03
-- BATCH-01-REVIEW.md
+## Phase 1 — OS and Processes
 
-C# focus:
+1. Chapter 01
+2. Chapter 02
+3. Chapter 03
+4. BATCH-01-REVIEW.md
+
+Gate:
 
 ~~~text
-Console
-Process
-ProcessStartInfo
-WaitForExit
-File API for /proc
-P/Invoke observation
+OS / Kernel / Syscall
+Process / PID / State
+Context Switch
+fork / exec / wait / zombie
+C# Process mapping
 ~~~
 
-## Phase 2 — Threads and Synchronization
+---
 
-- Chapter 04
-- Chapter 05
-- MIDTERM-REVIEW-01-05.md
-- Chapter 06
-- BATCH-02-REVIEW.md
+## Phase 2 — Threads / Midterm
 
-C# focus:
+1. Chapter 04
+2. Chapter 05
+3. MIDTERM-REVIEW-01-05.md
+
+ทำ Source-Aligned Exercises Parts A–C
+
+Gate:
 
 ~~~text
-Thread
-Start
-Join
-Sleep
-lock
-Monitor
-Volatile
-Interlocked
+Thread Start/Join
+Concurrency
+Race
+Shared State
+Atomicity / Visibility / Ordering
+Activity 02 / 03 explanation
+~~~
+
+---
+
+## Phase 3 — Synchronization
+
+1. Chapter 06
+2. Chapter 07
+3. Chapter 08
+4. BATCH-02-REVIEW.md
+5. BATCH-03-REVIEW.md
+
+ทำ Source-Aligned Exercises Parts D–F
+
+Gate:
+
+~~~text
+System.Threading.Lock
+object + Monitor
 SemaphoreSlim
+Interlocked
+Producer–Consumer
+Deadlock / Starvation / Livelock
 ~~~
 
-## Phase 3 — Classic Synchronization and Scheduling
+---
 
-- Chapter 07
-- Chapter 08
-- Chapter 09
-- BATCH-03-REVIEW.md
+## Phase 4 — Scheduling
 
-C# focus:
+1. Chapter 09
+2. Scheduling exercises
+3. run scheduler self-test
+
+Gate:
 
 ~~~text
-Monitor.Wait
-Monitor.PulseAll
-ReaderWriterLockSlim
-Barrier
-Queue
-C# Scheduling Simulator
+FCFS/SJF/SRTF/Priority/RR/MLFQ
+CT/TAT/WT/RT
+textbook vs Linux scheduler
 ~~~
 
-## Phase 4 — Memory
+---
 
-- Chapter 10
-- Chapter 11
-- BATCH-04-REVIEW.md
+## Phase 5 — Memory
 
-C# focus:
+1. Chapter 10
+2. Chapter 11
+3. BATCH-04-REVIEW.md
+
+Gate:
 
 ~~~text
-Environment.SystemPageSize
-IntPtr
-Marshal
-MemoryMappedFile
-P/Invoke getrusage
-C# page replacement
+VA/PA
+MMU/TLB/Page Table
+Demand Paging
+Page Fault
+mmap/mprotect
+Replacement
+COW
 ~~~
 
-## Phase 5
+---
 
-- FINAL-INTEGRATION.md
-- FINAL-REVIEW.md
-- capstone/README.md
+## Phase 6 — Final Integration
 
-อย่าข้ามบทจนกว่าจะอธิบายและเขียน C# exercise หลักได้เอง
+1. FINAL-INTEGRATION.md
+2. FINAL-REVIEW.md
+3. CORRECTNESS-GATES.md
+4. capstone/README.md
+5. FULL-COVERAGE-AUDIT.md
+
+---
+
+# Rule
+
+อย่าไปบทถัดไปเพียงเพราะอ่านจบ
+
+ไปต่อเมื่อ:
+
+~~~text
+อธิบายเองได้
++
+trace ได้
++
+เขียน C# ได้
++
+หา bug ได้
++
+รัน lab ได้
++
+Linux observation ได้
++
+self-test/invariant ผ่าน
+~~~
