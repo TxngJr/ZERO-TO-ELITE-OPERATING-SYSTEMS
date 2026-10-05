@@ -1,16 +1,10 @@
 # Zero to Elite Operating Systems
 
-หลักสูตร Operating Systems แบบลงมือทำบน **Fedora Linux / x86-64** จาก Absolute Zero ไปสู่ระดับ Systems Engineer
+หลักสูตร Operating Systems แบบลงมือทำบน **Fedora Linux / x86-64** จาก Absolute Zero → Core OS Foundations → Systems-Level Reasoning
 
 > Primary lab environment: Acer Aspire 7 A715-43G, AMD Ryzen 7 5825U, Fedora Linux
 
-## Learning model
-
-~~~text
-Why → Concept → Mental Model → Linux → Code → Run → Observe → Debug → Explain
-~~~
-
-## Core roadmap
+## Core Course Status
 
 1. ✅ Course Overview & OS Introduction
 2. ✅ Process & Context Switch Part I
@@ -21,88 +15,127 @@ Why → Concept → Mental Model → Linux → Code → Run → Observe → Debu
 7. ✅ Synchronization Part II
 8. ✅ Synchronization Part III
 9. ✅ Scheduling
-10. ⏳ Address Translation
-11. ⏳ Virtual Memory
+10. ✅ Address Translation
+11. ✅ Virtual Memory
 
-## Batch 1
+**Core Scope 01–11 is complete.**
+
+คำว่า complete หมายถึงครบตาม scope 11 บทนี้ ไม่ได้หมายความว่า Operating Systems ทั้งสาขามีเพียง 11 บท
+
+---
+
+## Start Here
+
+1. [Course Guide](./COURSE-GUIDE.md)
+2. [Fedora Setup](./SETUP-FEDORA.md)
+3. [Study Order](./STUDY-ORDER.md)
+
+---
+
+## Batch 1 — OS and Processes
 
 - [Chapter 01 — OS Introduction](./01-os-introduction/README.md)
 - [Chapter 02 — Process & Context Switch I](./02-process-context-I/README.md)
 - [Chapter 03 — Process & Context Switch II](./03-process-context-II/README.md)
 - [Batch 01 Review](./BATCH-01-REVIEW.md)
 
-## Batch 2
+## Batch 2 — Concurrency
 
-- [Chapter 04 — Concurrency Part I](./04-concurrency-I/README.md)
-- [Chapter 05 — Concurrency Part II](./05-concurrency-II/README.md)
+- [Chapter 04 — Concurrency I](./04-concurrency-I/README.md)
+- [Chapter 05 — Concurrency II](./05-concurrency-II/README.md)
 - [Midterm Review — Chapters 01–05](./MIDTERM-REVIEW-01-05.md)
-- [Chapter 06 — Synchronization Part I](./06-synchronization-I/README.md)
+- [Chapter 06 — Synchronization I](./06-synchronization-I/README.md)
 - [Batch 02 Review](./BATCH-02-REVIEW.md)
 
-## Batch 3
+## Batch 3 — Advanced Synchronization and Scheduling
 
-- [Chapter 07 — Synchronization Part II](./07-synchronization-II/README.md)
-- [Chapter 08 — Synchronization Part III](./08-synchronization-III/README.md)
+- [Chapter 07 — Synchronization II](./07-synchronization-II/README.md)
+- [Chapter 08 — Synchronization III](./08-synchronization-III/README.md)
 - [Chapter 09 — Scheduling](./09-scheduling/README.md)
 - [Scheduling Exercises](./09-scheduling/EXERCISES.md)
-- [Scheduling References](./09-scheduling/REFERENCES.md)
 - [Batch 03 Review](./BATCH-03-REVIEW.md)
 
-## Setup
+## Batch 4 — Memory
+
+- [Chapter 10 — Address Translation](./10-address-translation/README.md)
+- [Chapter 11 — Virtual Memory](./11-virtual-memory/README.md)
+- [Batch 04 Review](./BATCH-04-REVIEW.md)
+
+---
+
+## Final Integration
+
+- [Final Integration](./FINAL-INTEGRATION.md)
+- [Final Review](./FINAL-REVIEW.md)
+- [Capstone](./capstone/README.md)
+- [Full Core Coverage Audit](./FULL-COVERAGE-AUDIT.md)
+
+---
+
+## Learning Model
+
+~~~text
+Why
+↓
+Concept
+↓
+Mental Model
+↓
+Linux
+↓
+Code
+↓
+Run
+↓
+Observe
+↓
+Debug
+↓
+Explain
+~~~
+
+---
+
+## Whole-Course Build
 
 ~~~bash
 git clone https://github.com/TxngJr/ZERO-TO-ELITE-OPERATING-SYSTEMS.git
 cd ZERO-TO-ELITE-OPERATING-SYSTEMS
+
+make core-build
+make python-check
+make smoke
 ~~~
 
-อ่าน [SETUP-FEDORA.md](./SETUP-FEDORA.md)
+cleanup:
 
-## Current knowledge chain
+~~~bash
+make clean
+~~~
+
+---
+
+## Core Toolchain
 
 ~~~text
-Hardware
-  ↓
-Kernel / User Space
-  ↓
-System Calls
-  ↓
-Process / Context Switch
-  ↓
-fork / exec / wait
-  ↓
-Threads / Concurrency
-  ↓
-Race Conditions
-  ↓
-Mutex / Semaphore / Atomics
-  ↓
-Producer–Consumer / Readers–Writers / Dining Philosophers
-  ↓
-Deadlock / Starvation / Livelock
-  ↓
-CPU Scheduling
+C17
+GCC
+POSIX Threads
+Linux /proc
+strace
+gdb
+perf
+ps / pstree / top
+vmstat / free / pmap
+Python 3 simulators
+GitHub Actions Fedora CI
 ~~~
 
-## Current practical programs
+---
 
-หลักสูตรตอนนี้มี labs สำหรับ:
+## Simulators
 
-- syscall observation
-- process/procfs inspection
-- fork/exec/wait/zombie
-- POSIX threads
-- race conditions
-- release/acquire atomics
-- mutex/semaphore/CAS
-- producer–consumer
-- readers–writers
-- dining philosophers
-- monitor-like queue
-- wait-for cycle detection
-- bounded livelock
-- CPU scheduling simulation
-
-## Scheduling Simulator
+Scheduling:
 
 ~~~bash
 python3 09-scheduling/scheduler_sim.py --algo fcfs
@@ -111,25 +144,81 @@ python3 09-scheduling/scheduler_sim.py --algo rr --quantum 2
 python3 09-scheduling/scheduler_sim.py --algo mlfq
 ~~~
 
-รองรับ:
+Address translation:
 
-~~~text
-FCFS
-SJF
-SRTF
-Priority
-Preemptive Priority
-Round Robin
-MLFQ
+~~~bash
+python3 10-address-translation/page_table_sim.py
 ~~~
 
-## Next Batch
+Page replacement:
 
-Batch 4 จะปิด Core Curriculum:
+~~~bash
+python3 11-virtual-memory/page_replacement_sim.py
+~~~
 
-- Chapter 10 — Address Translation
-- Chapter 11 — Virtual Memory
-- Final Integration
-- Final Review
-- Capstone
-- Full Course Coverage Audit
+---
+
+## End-to-End Knowledge Chain
+
+~~~text
+Hardware
+↓
+Kernel / User Space
+↓
+System Calls
+↓
+Process / Context Switch
+↓
+fork / exec / wait
+↓
+Threads
+↓
+Concurrency
+↓
+Synchronization
+↓
+Deadlock / Starvation / Livelock
+↓
+Scheduling
+↓
+Virtual Address
+↓
+MMU / TLB / Page Table
+↓
+Demand Paging / Page Fault
+↓
+Virtual Memory / COW / mmap / Protection
+~~~
+
+---
+
+## After Core Course
+
+Advanced Track can continue with:
+
+~~~text
+Signals
+IPC
+Pipes
+Shared Memory
+Sockets
+VFS / Filesystems
+Page Cache
+Block I/O
+Device Drivers
+Kernel Modules
+Namespaces / cgroups
+Containers
+NUMA
+SLUB
+Futex
+RCU
+Lock-Free Programming
+io_uring
+Real-Time Linux
+Security / SELinux / Capabilities
+Virtualization
+Kernel Compilation
+Kernel Debugging
+Building a Small OS
+~~~
