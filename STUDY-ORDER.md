@@ -1,133 +1,91 @@
-# Study Order
+# Study Order — C# Edition
 
-## Phase 0 — Setup
+## Phase 0
 
 1. README.md
 2. COURSE-GUIDE.md
 3. SETUP-FEDORA.md
+4. CSHARP-OS-MAPPING.md
 
----
+## Phase 1 — OS and Process
 
-## Phase 1 — OS and Processes
+- Chapter 01
+- Chapter 02
+- Chapter 03
+- BATCH-01-REVIEW.md
 
-1. 01-os-introduction
-2. 02-process-context-I
-3. 03-process-context-II
-4. BATCH-01-REVIEW.md
-
-Checkpoint:
+C# focus:
 
 ~~~text
-OS
-Kernel/User Space
-System Call
-Program/Process
-PID/PPID
-Process State
-CPU Context
-fork/exec/wait
-Zombie
+Console
+Process
+ProcessStartInfo
+WaitForExit
+File API for /proc
+P/Invoke observation
 ~~~
 
----
+## Phase 2 — Threads and Synchronization
 
-## Phase 2 — Concurrency and Basic Synchronization
+- Chapter 04
+- Chapter 05
+- MIDTERM-REVIEW-01-05.md
+- Chapter 06
+- BATCH-02-REVIEW.md
 
-1. 04-concurrency-I
-2. 05-concurrency-II
-3. MIDTERM-REVIEW-01-05.md
-4. 06-synchronization-I
-5. BATCH-02-REVIEW.md
-
-Checkpoint:
+C# focus:
 
 ~~~text
 Thread
-Concurrency
-Parallelism
-Interleaving
-Race Condition
-Data Race
-Critical Section
-Mutex
-Semaphore
-Atomic RMW
-CAS
+Start
+Join
+Sleep
+lock
+Monitor
+Volatile
+Interlocked
+SemaphoreSlim
 ~~~
 
----
+## Phase 3 — Classic Synchronization and Scheduling
 
-## Phase 3 — Advanced Synchronization and Scheduling
+- Chapter 07
+- Chapter 08
+- Chapter 09
+- BATCH-03-REVIEW.md
 
-1. 07-synchronization-II
-2. 08-synchronization-III
-3. 09-scheduling
-4. BATCH-03-REVIEW.md
-
-Checkpoint:
+C# focus:
 
 ~~~text
-Producer–Consumer
-Readers–Writers
-Dining Philosophers
-Monitor
-Condition Variable
-Deadlock
-Starvation
-Livelock
-Priority Inversion
-FCFS/SJF/SRTF/Priority/RR/MLFQ
-Scheduling Metrics
+Monitor.Wait
+Monitor.PulseAll
+ReaderWriterLockSlim
+Barrier
+Queue
+C# Scheduling Simulator
 ~~~
-
----
 
 ## Phase 4 — Memory
 
-1. 10-address-translation
-2. 11-virtual-memory
-3. BATCH-04-REVIEW.md
+- Chapter 10
+- Chapter 11
+- BATCH-04-REVIEW.md
 
-Checkpoint:
-
-~~~text
-VA/PA
-MMU
-Page/Frame
-Page Table
-TLB
-Demand Paging
-Page Fault
-Replacement
-Swap
-mmap
-COW
-Protection
-~~~
-
----
-
-## Phase 5 — Integration
-
-1. FINAL-INTEGRATION.md
-2. FINAL-REVIEW.md
-3. capstone/README.md
-4. FULL-COVERAGE-AUDIT.md
-
----
-
-## Recommended Rule
-
-อย่าเรียนต่อเพียงเพราะอ่านบทก่อนจบ
-
-ไปบทถัดไปเมื่อสามารถ:
+C# focus:
 
 ~~~text
-อธิบายโดยไม่เปิดโน้ต
-+
-รัน lab ได้
-+
-ทำนาย output หลักได้
-+
-แก้ exercise ระดับ trace/design ได้
+Environment.SystemPageSize
+IntPtr
+Marshal
+MemoryMappedFile
+P/Invoke getrusage
+C# page replacement
 ~~~
+
+## Phase 5
+
+- FINAL-INTEGRATION.md
+- FINAL-REVIEW.md
+- capstone/README.md
+
+อย่าข้ามบทจนกว่าจะอธิบายและเขียน C# exercise หลักได้เอง

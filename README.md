@@ -1,224 +1,105 @@
-# Zero to Elite Operating Systems
+# Zero to Elite Operating Systems — C# Edition
 
-หลักสูตร Operating Systems แบบลงมือทำบน **Fedora Linux / x86-64** จาก Absolute Zero → Core OS Foundations → Systems-Level Reasoning
+หลักสูตร Operating Systems บน **Fedora Linux + C#/.NET** จาก Absolute Zero ไปถึง Core OS Foundations โดยใช้รูปแบบการเขียนโปรแกรมให้สอดคล้องกับงานที่เรียนจริง เช่น:
 
-> Primary lab environment: Acer Aspire 7 A715-43G, AMD Ryzen 7 5825U, Fedora Linux
+~~~csharp
+using System.Threading;
 
-## Core Course Status
+Thread t = new Thread(...);
+t.Start();
+t.Join();
 
-1. ✅ Course Overview & OS Introduction
-2. ✅ Process & Context Switch Part I
-3. ✅ Process & Context Switch Part II
-4. ✅ Concurrency Part I
-5. ✅ Concurrency Part II
-6. ✅ Synchronization Part I
-7. ✅ Synchronization Part II
-8. ✅ Synchronization Part III
+lock (lockObj)
+{
+    Monitor.Wait(lockObj);
+    Monitor.PulseAll(lockObj);
+}
+~~~
+
+## Core Roadmap
+
+1. ✅ OS Introduction
+2. ✅ Process & Context Switch I
+3. ✅ Process & Context Switch II
+4. ✅ Concurrency I
+5. ✅ Concurrency II
+6. ✅ Synchronization I
+7. ✅ Synchronization II
+8. ✅ Synchronization III
 9. ✅ Scheduling
 10. ✅ Address Translation
 11. ✅ Virtual Memory
 
-**Core Scope 01–11 is complete.**
+## Language Rule
 
-คำว่า complete หมายถึงครบตาม scope 11 บทนี้ ไม่ได้หมายความว่า Operating Systems ทั้งสาขามีเพียง 11 บท
+**ทุก source-code example, programming lab, simulator และ programming exercise ใช้ C#**
 
----
+Linux commands เช่น ps, strace, pmap และ vmstat ยังคงใช้ตามจริง เพราะเป็นเครื่องมือสังเกต OS ไม่ใช่ภาษาโปรแกรมหลักของคอร์ส
 
 ## Start Here
 
-1. [Course Guide](./COURSE-GUIDE.md)
-2. [Fedora Setup](./SETUP-FEDORA.md)
-3. [Study Order](./STUDY-ORDER.md)
+1. [COURSE-GUIDE.md](./COURSE-GUIDE.md)
+2. [SETUP-FEDORA.md](./SETUP-FEDORA.md)
+3. [STUDY-ORDER.md](./STUDY-ORDER.md)
 
----
+## C# Concepts Used Across the Course
 
-## Batch 1 — OS and Processes
+~~~text
+Thread
+Thread.Start
+Thread.Join
+Thread.Sleep
+lock
+Monitor.Wait
+Monitor.Pulse / PulseAll
+Interlocked
+Volatile
+Mutex
+SemaphoreSlim
+ReaderWriterLockSlim
+Process / ProcessStartInfo
+MemoryMappedFile
+Marshal / IntPtr
+P/Invoke
+~~~
 
-- [Chapter 01 — OS Introduction](./01-os-introduction/README.md)
-- [Chapter 02 — Process & Context Switch I](./02-process-context-I/README.md)
-- [Chapter 03 — Process & Context Switch II](./03-process-context-II/README.md)
-- [Batch 01 Review](./BATCH-01-REVIEW.md)
+## Build All C# Projects
 
-## Batch 2 — Concurrency
+~~~bash
+./build.sh
+~~~
 
-- [Chapter 04 — Concurrency I](./04-concurrency-I/README.md)
-- [Chapter 05 — Concurrency II](./05-concurrency-II/README.md)
-- [Midterm Review — Chapters 01–05](./MIDTERM-REVIEW-01-05.md)
-- [Chapter 06 — Synchronization I](./06-synchronization-I/README.md)
-- [Batch 02 Review](./BATCH-02-REVIEW.md)
+## Run a Chapter
 
-## Batch 3 — Advanced Synchronization and Scheduling
+~~~bash
+dotnet run --project 04-concurrency-I/examples/Chapter04.csproj -- race
+dotnet run --project 07-synchronization-II/examples/Chapter07.csproj -- producer-consumer
+dotnet run --project 09-scheduling/examples/Chapter09.csproj -- rr 2
+~~~
 
-- [Chapter 07 — Synchronization II](./07-synchronization-II/README.md)
-- [Chapter 08 — Synchronization III](./08-synchronization-III/README.md)
-- [Chapter 09 — Scheduling](./09-scheduling/README.md)
-- [Scheduling Exercises](./09-scheduling/EXERCISES.md)
-- [Batch 03 Review](./BATCH-03-REVIEW.md)
+## Managed-Runtime Mental Model
 
-## Batch 4 — Memory
+~~~text
+C# Source
+↓
+.NET Compiler / IL
+↓
+CLR / CoreCLR
+↓
+Managed Thread / GC / BCL
+↓
+Linux System Calls
+↓
+Kernel
+↓
+Hardware
+~~~
 
-- [Chapter 10 — Address Translation](./10-address-translation/README.md)
-- [Chapter 11 — Virtual Memory](./11-virtual-memory/README.md)
-- [Batch 04 Review](./BATCH-04-REVIEW.md)
+ดังนั้นคอร์สจะสอนทั้ง OS concept, Linux behavior, C# abstraction และจุดที่ abstraction ไม่ใช่ syscall แบบ 1:1
 
----
+## Reviews
 
-## Final Integration
-
-- [Final Integration](./FINAL-INTEGRATION.md)
+- [Midterm Review 01–05](./MIDTERM-REVIEW-01-05.md)
 - [Final Review](./FINAL-REVIEW.md)
 - [Capstone](./capstone/README.md)
-- [Full Core Coverage Audit](./FULL-COVERAGE-AUDIT.md)
-
----
-
-## Learning Model
-
-~~~text
-Why
-↓
-Concept
-↓
-Mental Model
-↓
-Linux
-↓
-Code
-↓
-Run
-↓
-Observe
-↓
-Debug
-↓
-Explain
-~~~
-
----
-
-## Whole-Course Build
-
-~~~bash
-git clone https://github.com/TxngJr/ZERO-TO-ELITE-OPERATING-SYSTEMS.git
-cd ZERO-TO-ELITE-OPERATING-SYSTEMS
-
-make core-build
-make python-check
-make smoke
-~~~
-
-cleanup:
-
-~~~bash
-make clean
-~~~
-
----
-
-## Core Toolchain
-
-~~~text
-C17
-GCC
-POSIX Threads
-Linux /proc
-strace
-gdb
-perf
-ps / pstree / top
-vmstat / free / pmap
-Python 3 simulators
-GitHub Actions Fedora CI
-~~~
-
----
-
-## Simulators
-
-Scheduling:
-
-~~~bash
-python3 09-scheduling/scheduler_sim.py --algo fcfs
-python3 09-scheduling/scheduler_sim.py --algo srtf
-python3 09-scheduling/scheduler_sim.py --algo rr --quantum 2
-python3 09-scheduling/scheduler_sim.py --algo mlfq
-~~~
-
-Address translation:
-
-~~~bash
-python3 10-address-translation/page_table_sim.py
-~~~
-
-Page replacement:
-
-~~~bash
-python3 11-virtual-memory/page_replacement_sim.py
-~~~
-
----
-
-## End-to-End Knowledge Chain
-
-~~~text
-Hardware
-↓
-Kernel / User Space
-↓
-System Calls
-↓
-Process / Context Switch
-↓
-fork / exec / wait
-↓
-Threads
-↓
-Concurrency
-↓
-Synchronization
-↓
-Deadlock / Starvation / Livelock
-↓
-Scheduling
-↓
-Virtual Address
-↓
-MMU / TLB / Page Table
-↓
-Demand Paging / Page Fault
-↓
-Virtual Memory / COW / mmap / Protection
-~~~
-
----
-
-## After Core Course
-
-Advanced Track can continue with:
-
-~~~text
-Signals
-IPC
-Pipes
-Shared Memory
-Sockets
-VFS / Filesystems
-Page Cache
-Block I/O
-Device Drivers
-Kernel Modules
-Namespaces / cgroups
-Containers
-NUMA
-SLUB
-Futex
-RCU
-Lock-Free Programming
-io_uring
-Real-Time Linux
-Security / SELinux / Capabilities
-Virtualization
-Kernel Compilation
-Kernel Debugging
-Building a Small OS
-~~~
+- [Full Coverage Audit](./FULL-COVERAGE-AUDIT.md)

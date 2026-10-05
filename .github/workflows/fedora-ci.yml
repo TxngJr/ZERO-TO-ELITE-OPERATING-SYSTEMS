@@ -1,4 +1,4 @@
-name: Fedora Course CI
+name: Fedora CSharp Course CI
 
 on:
   push:
@@ -13,20 +13,33 @@ jobs:
 
     steps:
       - name: Install tools
-        run: dnf install -y git gcc make python3
+        run: dnf install -y git dotnet-sdk-10.0 procps-ng
 
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build whole core course
-        run: make core-build
+      - name: Build all CSharp chapters
+        run: bash ./build.sh
 
-      - name: Python syntax check
-        run: make python-check
+      - name: Smoke Chapter 01
+        run: dotnet run --project 01-os-introduction/examples/Chapter01.csproj --no-build -c Release
 
-      - name: Whole-course smoke tests
-        shell: bash
+      - name: Smoke Chapter 03
+        run: dotnet run --project 03-process-context-II/examples/Chapter03.csproj --no-build -c Release
+
+      - name: Smoke Threads
         run: |
-          set -euxo pipefail
-          ulimit -c 0
-          make smoke
+          dotnet run --project 04-concurrency-I/examples/Chapter04.csproj --no-build -c Release -- basic
+          dotnet run --project 05-concurrency-II/examples/Chapter05.csproj --no-build -c Release -- visibility
+          dotnet run --project 06-synchronization-I/examples/Chapter06.csproj --no-build -c Release -- cas
+
+      - name: Smoke Synchronization
+        run: |
+          dotnet run --project 07-synchronization-II/examples/Chapter07.csproj --no-build -c Release -- producer-consumer
+          dotnet run --project 08-synchronization-III/examples/Chapter08.csproj --no-build -c Release -- graph
+
+      - name: Smoke Scheduling and Memory
+        run: |
+          dotnet run --project 09-scheduling/examples/Chapter09.csproj --no-build -c Release -- fcfs
+          dotnet run --project 10-address-translation/examples/Chapter10.csproj --no-build -c Release -- table
+          dotnet run --project 11-virtual-memory/examples/Chapter11.csproj --no-build -c Release -- replacement

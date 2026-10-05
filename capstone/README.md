@@ -1,231 +1,65 @@
-# Capstone — Mini OS Behavior Laboratory
+# Capstone — C# OS Behavior Laboratory
 
-## Goal
+## Rule
 
-สร้าง laboratory repository section ที่พิสูจน์ concepts จาก Chapters 01–11 แบบ end-to-end
+ทุก programming artifact ต้องเป็น C#
 
-ไม่ใช่การเขียน kernel ใหม่ แต่เป็นการพิสูจน์ behavior ของ OS จริงจาก user space
+## Modules
 
----
+1. C# → syscall observation
+2. Process inspector
+3. Child process lifecycle
+4. Threads
+5. Race condition
+6. lock / Monitor / Interlocked
+7. Producer–Consumer
+8. Deadlock graph
+9. C# Scheduling Simulator
+10. C# Address Translation Simulator
+11. C# Virtual Memory / Page Replacement Lab
 
-## Required Modules
+## Required Final Program
 
-~~~text
-capstone-work/
-├── 01-system-call/
-├── 02-process/
-├── 03-fork-exec-wait/
-├── 04-threads/
-├── 05-race/
-├── 06-synchronization/
-├── 07-classic-sync/
-├── 08-deadlock/
-├── 09-scheduling/
-├── 10-address-translation/
-├── 11-virtual-memory/
-└── REPORT.md
-~~~
-
----
-
-## Module 01 — System Call
-
-ต้อง:
-
-- เขียน Hello C
-- trace ด้วย strace
-- แยก library call vs syscall
-- อธิบาย user/kernel transition
-
-Evidence:
-
-- source
-- command
-- selected output
-- explanation
-
----
-
-## Module 02 — Process
-
-ต้องสังเกต:
-
-- PID
-- PPID
-- process state
-- /proc/PID/status
-- /proc/PID/maps
-- /proc/PID/fd
-
----
-
-## Module 03 — fork / exec / wait
-
-ต้อง:
-
-- create child
-- exec external program
-- wait status
-- explain zombie window
-- explain COW connection
-
----
-
-## Module 04 — Threads
-
-ต้อง:
-
-- create multiple pthreads
-- show PID/TIDs
-- ps -L
-- explain stack/shared address space
-
----
-
-## Module 05 — Race
-
-ต้องสร้าง logical lost update แบบ defined behavior ตามแนว Chapter 04
-
-รายงาน:
-
-- invariant
-- interleaving
-- observed failure
-
----
-
-## Module 06 — Synchronization
-
-แก้ race ด้วยอย่างน้อย:
-
-- mutex
-- atomic RMW
-
-จากนั้นเปรียบเทียบ:
-
-- correctness
-- complexity
-- performance assumptions
-
----
-
-## Module 07 — Classic Synchronization
-
-เลือกอย่างน้อย 2:
-
-- Producer–Consumer
-- Readers–Writers
-- Dining Philosophers
-
-ต้องเขียน invariant และ waiting conditions
-
----
-
-## Module 08 — Deadlock
-
-ห้ามสร้าง infinite hang เป็นหลักฐานเพียงอย่างเดียว
-
-ใช้:
-
-- wait-for graph
-- cycle detector
-- lock-order reasoning
-
-อธิบาย Coffman Conditions
-
----
-
-## Module 09 — Scheduling
-
-สร้าง workload อย่างน้อย 5 processes
-
-ทำ:
-
-- FCFS
-- SRTF
-- RR
-- MLFQ
-
-รายงาน:
-
-- timeline
-- TAT
-- WT
-- RT
-
----
-
-## Module 10 — Address Translation
-
-ต้อง:
-
-- query page size
-- split VA → VPN + offset
-- inspect /proc/PID/maps
-- run page-table simulator
-- explain TLB miss vs page fault
-
----
-
-## Module 11 — Virtual Memory
-
-ต้อง:
-
-- observe page faults
-- demonstrate COW
-- demonstrate mmap file
-- demonstrate protection fault safely
-- compare FIFO/LRU/Clock
-
----
-
-## REPORT.md Required Sections
+สร้าง C# console app ที่มี menu:
 
 ~~~text
-1. Environment
-2. Kernel Version
-3. CPU Topology
-4. Experiments
-5. Predictions
-6. Observations
-7. Explanations
-8. Failed Predictions
-9. Corrections
-10. Final Mental Model
+1 Process Info
+2 Thread Demo
+3 Race Demo
+4 Lock Demo
+5 Producer Consumer
+6 Deadlock Graph
+7 Scheduling
+8 Address Translation
+9 Page Replacement
+10 Memory Mapping
 ~~~
 
----
+## Report
 
-## Capstone Rule
+ทุก module ต้องมี:
 
-ทุก experiment ต้องมี:
-
-~~~text
-Prediction
-Command / Code
-Observed Result
-Why It Happened
-What Would Break the Model
-Connection to Another Chapter
-~~~
-
----
+- Prediction
+- C# Code
+- Command
+- Observation
+- OS Explanation
+- Common Bug
+- Fix
 
 ## Graduation Test
 
-อธิบาย scenario เดียว:
+อธิบาย:
 
 ~~~text
-launch program
-→ process
-→ scheduler
-→ thread
-→ synchronized shared state
-→ virtual memory access
-→ TLB/page table
-→ possible page fault
-→ resume
-→ exit/reap
+C# Program
+→ .NET Runtime
+→ Linux Process/Thread
+→ Scheduler
+→ CPU
+→ Synchronization
+→ Virtual Address
+→ MMU/TLB/Page Table
+→ Page Fault
+→ Kernel
 ~~~
-
-ถ้าอธิบายได้พร้อม evidence จาก labs แสดงว่า Core Course ถูก integrate จริง
